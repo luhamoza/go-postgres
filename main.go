@@ -42,18 +42,57 @@ func main() {
 	}
 
 	// insert a row
+	query := `insert into users (first_name,last_name) values ($1,$2)`
+	_, err = db.Exec(query, "Mike", "Mom")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Inserted a row!")
 
 	// get rows from table again
+	err = getAllRows(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// update a row
-
+	stmt := `update users set first_name = $1 where id = $2`
+	_, err = db.Exec(stmt, "Terraform", 3)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// get rows from table again
+	err = getAllRows(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// get one row by id
+	query = `select id,first_name,last_name from users where id = $1`
+	var (
+		firstName, lastName string
+		id                  int
+	)
+	row := db.QueryRow(query, 3)
+	err = row.Scan(&id, &firstName, &lastName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("QueryRow return", id, firstName, lastName)
 
 	// delete a row
+	query = `delete from users where id = $1`
+	_, err = db.Exec(query, 7)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Deleted a row")
 
 	// get rows again
+	err = getAllRows(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func getAllRows(db *sql.DB) error {
